@@ -1,0 +1,15 @@
+# 👑 Main Repository Owner (You review and oversee everything)
+* @alansoul
+
+# ⚙️ Workspace Configuration & Tooling (Full Stack Leads)
+.github/ @alansoul
+nx.json @alansoul
+package.json @alansoul
+pnpm-lock.yaml @alansoul
+.npmrc @alansoul
+
+# 🎨 Existing Next.js App (Full Stack Leads + Frontend Team)
+apps/workspace/ @alansoul
+
+# 🧪 E2E Testing
+apps/workspace-e2e/ @alansoul

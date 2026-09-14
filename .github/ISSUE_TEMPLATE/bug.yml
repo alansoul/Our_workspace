@@ -1,0 +1,28 @@
+name: 🐛 Bug Report
+description: Report a reproducible problem
+title: '[BUG]: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: 'Thanks for reporting. Please fill out the required sections.'
+  - type: input
+    id: app
+    attributes:
+      label: Which application / service?
+      placeholder: 'e.g. apps/workspace, auth-api'
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to trigger the bug.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: Paste terminal output or browser console logs here.
+      render: shell
