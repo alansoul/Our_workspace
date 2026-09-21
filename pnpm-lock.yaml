@@ -47,6 +47,9 @@ importers:
       rxjs:
         specifier: ^7.8.0
         version: 7.8.1
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
     devDependencies:
       '@babel/core':
         specifier: ^7.14.5
@@ -204,9 +207,6 @@ importers:
       ts-node:
         specifier: 10.9.1
         version: 10.9.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(@types/node@22.20.2)(typescript@6.0.3)
-      tslib:
-        specifier: ^2.3.0
-        version: 2.8.1
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
