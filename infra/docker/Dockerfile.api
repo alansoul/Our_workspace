@@ -33,11 +33,11 @@ RUN npm install -g pnpm@9
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
-# Copy compiled build output from builder
-COPY --from=builder /app/dist/apps/api ./dist/apps/api
+# Copy compiled build output from apps/api/dist
+COPY --from=builder /app/apps/api/dist ./dist
 
 # Expose standard port
 EXPOSE 3000
 
 # Start NestJS
-CMD ["node", "dist/apps/api/main.js"]
+CMD ["node", "dist/main.js"]
