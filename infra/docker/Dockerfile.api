@@ -15,6 +15,9 @@ RUN pnpm install --frozen-lockfile
 # Copy all workspace source code
 COPY . .
 
+# Sync TypeScript project references
+RUN pnpm nx sync
+
 # Build the NestJS API app
 RUN pnpm nx build api --prod
 
