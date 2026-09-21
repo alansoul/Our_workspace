@@ -33,16 +33,3 @@ services:
       - key: REDIS_URL
         sync: false
 
-  # 3. Background BullMQ Worker
-  - type: worker
-    name: workspace-worker
-    runtime: docker
-    dockerContext: .
-    dockerfilePath: infra/docker/Dockerfile.worker
-    plan: free
-    region: singapore
-    envVars:
-      - key: DATABASE_URL
-        sync: false
-      - key: REDIS_URL
-        sync: false

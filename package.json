@@ -14,7 +14,7 @@
     "db:push": "npx prisma db push --schema=libs/data-access/prisma/schema.prisma",
     "db:studio": "npx prisma studio --schema=libs/data-access/prisma/schema.prisma",
     "clean": "nx reset",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "private": true,
   "dependencies": {

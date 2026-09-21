@@ -11,7 +11,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 RUN npm install -g pnpm@9
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 COPY --from=builder /app/dist/apps/worker ./dist/apps/worker
 # No EXPOSE port needed - background process
 CMD ["node", "dist/apps/worker/main.js"]
