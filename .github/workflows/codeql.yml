@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
+      contents: read     # 👈 REQUIRED for private repositories!
+      actions: read      # 👈 REQUIRED to inspect workflow status
 
     steps:
       - name: Checkout repository
