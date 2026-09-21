@@ -8,6 +8,42 @@
     },
     {
       "path": "./apps/workspace"
+    },
+    {
+      "path": "./apps/realtime-e2e"
+    },
+    {
+      "path": "./apps/realtime"
+    },
+    {
+      "path": "./apps/api-e2e"
+    },
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./apps/worker-e2e"
+    },
+    {
+      "path": "./apps/worker"
+    },
+    {
+      "path": "./libs/database"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/cache"
+    },
+    {
+      "path": "./libs/api-client"
+    },
+    {
+      "path": "./libs/auth"
+    },
+    {
+      "path": "./libs/domain"
     }
   ]
 }

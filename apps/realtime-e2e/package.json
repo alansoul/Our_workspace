@@ -1,0 +1,27 @@
+{
+  "name": "@workspace/realtime-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "realtime-e2e",
+    "implicitDependencies": [
+      "realtime"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "dependsOn": [
+          "realtime:build",
+          "realtime:serve"
+        ],
+        "options": {
+          "jestConfig": "apps/realtime-e2e/jest.config.cts",
+          "passWithNoTests": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+services:
+  # 1. NestJS REST API
+  - type: web
+    name: workspace-api
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: infra/docker/Dockerfile.api
+    plan: free
+    region: singapore # or oregon, frankfurt
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false # Set in Render UI from Neon
+      - key: DIRECT_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false # Set in Render UI from Upstash
+      - key: JWT_SECRET
+        generateValue: true
+
+  # 2. WebSocket Realtime Service
+  - type: web
+    name: workspace-realtime
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: infra/docker/Dockerfile.realtime
+    plan: free
+    region: singapore
+    envVars:
+      - key: PORT
+        value: 3002
+      - key: REDIS_URL
+        sync: false
+
+  # 3. Background BullMQ Worker
+  - type: worker
+    name: workspace-worker
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: infra/docker/Dockerfile.worker
+    plan: free
+    region: singapore
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false

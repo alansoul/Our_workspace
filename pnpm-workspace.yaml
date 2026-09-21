@@ -1,6 +1,6 @@
 packages:
-  - "apps/*"
-
+  - 'apps/*'
+  - 'libs/*'
 autoInstallPeers: true
 allowBuilds:
   '@parcel/watcher': true
@@ -8,3 +8,4 @@ allowBuilds:
   nx: true
   sharp: true
   unrs-resolver: false
+  '@nestjs/core': false
