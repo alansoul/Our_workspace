@@ -3,22 +3,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm
 RUN npm install -g pnpm@9
 
-# Copy root dependency files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc nx.json tsconfig.base.json ./
 
-# Install all dependencies (including devDependencies needed for build)
 RUN pnpm install --frozen-lockfile
 
-# Copy all workspace source code
 COPY . .
 
-# Sync TypeScript project references
 RUN pnpm nx sync
-
-# Build the NestJS API app
 RUN pnpm nx build api --prod
 
 # Stage 2: Production runner stage
@@ -27,17 +20,10 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-RUN npm install -g pnpm@9
-
-# Copy package files and install only production dependencies
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-
-# Copy compiled build output from apps/api/dist
+# 👉 Copy all installed node_modules directly from builder (has tslib, nestjs, reflect-metadata)
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./dist
 
-# Expose standard port
 EXPOSE 3000
 
-# Start NestJS
 CMD ["node", "dist/main.js"]

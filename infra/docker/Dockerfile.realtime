@@ -1,19 +1,27 @@
+# Stage 1: Build stage
 FROM node:20-alpine AS builder
+
 WORKDIR /app
+
 RUN npm install -g pnpm@9
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc nx.json tsconfig.base.json ./
+
 RUN pnpm install --frozen-lockfile
+
 COPY . .
+
 RUN pnpm nx sync
 RUN pnpm nx build realtime --prod
 
+# Stage 2: Production runner stage
 FROM node:20-alpine AS runner
+
 WORKDIR /app
 ENV NODE_ENV=production
-RUN npm install -g pnpm@9
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-# Copy compiled build output from apps/realtime/dist
+
+# 👉 Copy all installed node_modules directly from builder
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/realtime/dist ./dist
 
 EXPOSE 3002
