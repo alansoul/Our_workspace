@@ -1,26 +1,31 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS so your Vercel frontend can call this backend
+  // 1. Enable Global Prefix (/api)
+  app.setGlobalPrefix('api');
+
+  // 2. Enable automatic DTO validation & strip unknown fields
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
+  // 3. Enable CORS for Vercel and local frontend
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:4200',
-      /\.vercel\.app$/, // Allows all your Vercel preview & production deployments
-    ],
+    origin: ['http://localhost:3000', 'http://localhost:4200', /\.vercel\.app$/],
     credentials: true,
   });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
+  console.log(`🚀 Core API is running on: http://localhost:${port}/api`);
 }
 
 bootstrap();

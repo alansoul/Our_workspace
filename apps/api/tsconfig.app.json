@@ -4,7 +4,7 @@
     "outDir": "dist",
     "module": "nodenext",
     "types": ["node"],
-    "rootDir": "src",
+    "rootDir": ".",
     "moduleResolution": "nodenext",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "experimentalDecorators": true,
@@ -22,5 +22,10 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"
+  ],
+  "references": [
+    {
+      "path": "../../libs/database/tsconfig.lib.json"
+    }
   ]
 }

@@ -16,6 +16,17 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@workspace/source"]
+    "customConditions": ["@workspace/source"],
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@workspace/database": ["./libs/database/src/index.ts"],
+      "@workspace/auth": ["./libs/auth/src/index.ts"],
+      "@workspace/cache": ["./libs/cache/src/index.ts"],
+      "@workspace/domain": ["./libs/domain/src/index.ts"],
+      "@workspace/ui": ["./libs/ui/src/index.ts"],
+      "@workspace/api-client": ["./libs/api-client/src/index.ts"],
+      "@workspace/shared/types": ["./libs/shared/types/src/index.ts"],
+      "@workspace/shared/constants": ["./libs/shared/constants/src/index.ts"]
+    }
   }
 }
