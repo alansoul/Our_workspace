@@ -67,3 +67,5 @@ npm-debug.*
 web-build/
 cache/
 
+# Project structure
+project_structure.txt
