@@ -11,6 +11,9 @@ RUN pnpm install --no-frozen-lockfile
 
 COPY . .
 
+# 👉 Generate Prisma Client from schema
+RUN pnpm exec prisma generate --schema=libs/database/prisma/schema.prisma
+
 RUN pnpm nx sync
 RUN pnpm nx build api --prod
 

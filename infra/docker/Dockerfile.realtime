@@ -11,6 +11,7 @@ RUN pnpm install --no-frozen-lockfile
 
 COPY . .
 
+RUN pnpm exec prisma generate --schema=libs/database/prisma/schema.prisma
 RUN pnpm nx sync
 RUN pnpm nx build realtime --prod
 
