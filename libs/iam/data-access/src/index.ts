@@ -1,1 +1,1 @@
-export * from './lib/iam-data-access.js';
+export * from './lib/iam-data-access';

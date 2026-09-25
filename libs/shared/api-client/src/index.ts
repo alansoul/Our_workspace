@@ -1,1 +1,1 @@
-export * from './lib/shared-api-client.js';
+export * from './lib/shared-api-client';
