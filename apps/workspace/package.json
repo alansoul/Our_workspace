@@ -2,6 +2,12 @@
   "name": "@workspace/workspace",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "npx prisma generate --schema=../../libs/database/prisma/schema.prisma && next build",
+    "vercel-build": "npx prisma generate --schema=../../libs/database/prisma/schema.prisma && next build",
+    "start": "next start"
+  },
   "nx": {
     "sourceRoot": "apps/workspace/src"
   },
