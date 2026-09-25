@@ -37,13 +37,19 @@
       "path": "./libs/cache"
     },
     {
-      "path": "./libs/api-client"
+      "path": "./libs/shared/api-client"
     },
     {
-      "path": "./libs/auth"
+      "path": "./libs/ui/primitives"
     },
     {
-      "path": "./libs/domain"
+      "path": "./libs/iam/data-access"
+    },
+    {
+      "path": "./libs/iam/feature-login"
+    },
+    {
+      "path": "./libs/iam/feature-register"
     }
   ]
 }

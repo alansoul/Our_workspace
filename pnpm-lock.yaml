@@ -375,19 +375,9 @@ importers:
 
   apps/workspace-e2e: {}
 
-  libs/api-client:
-    dependencies:
-      tslib:
-        specifier: ^2.3.0
-        version: 2.8.1
-
-  libs/auth: {}
-
   libs/cache: {}
 
   libs/database: {}
-
-  libs/domain: {}
 
   libs/ui: {}
 

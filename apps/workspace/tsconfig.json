@@ -1,16 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "composite": false,
+    "declarationMap": false,
     "jsx": "preserve",
     "noEmit": true,
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -20,18 +18,7 @@
         "name": "next"
       }
     ],
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "types": [
-      "jest",
-      "node"
-    ],
-    "outDir": "dist",
-    "rootDir": "src",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "types": ["jest", "node"]
   },
   "include": [
     "src/**/*.ts",
@@ -40,6 +27,8 @@
     "src/**/*.jsx",
     "../../apps/workspace/.next/types/**/*.ts",
     "../../dist/apps/workspace/.next/types/**/*.ts",
+    "../../libs/**/*.ts",
+    "../../libs/**/*.tsx",
     "index.d.ts",
     "next-env.d.ts"
   ],
@@ -55,5 +44,13 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"
+  ],
+  "references": [
+    {
+      "path": "../../libs/iam/feature-register"
+    },
+    {
+      "path": "../../libs/iam/feature-login"
+    }
   ]
 }
