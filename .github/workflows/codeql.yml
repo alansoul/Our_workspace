@@ -13,7 +13,7 @@ jobs:
     name: Analyze Code
     runs-on: ubuntu-latest
     permissions:
-      security-events: write
+      security-events: write                            # Can post security findings
       contents: read     # 👈 REQUIRED for private repositories!
       actions: read      # 👈 REQUIRED to inspect workflow status
 
@@ -21,10 +21,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Install CodeQL scanner
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript-typescript
+          languages: javascript-typescript               # Scan TS/JS
 
+      # Run the actual scan
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

@@ -1,19 +1,22 @@
 name: 'Setup Workspace'
 description: 'Sets up Node.js, pnpm, and caches dependencies.'
 runs:
-  using: 'composite'
+  using: 'composite' # Means "combine multiple steps into one reusable action"
   steps:
+  # STEP 1: Install pnpm v9 on the GitHub server
     - name: ⚙️ Setup pnpm
       uses: pnpm/action-setup@v3
       with:
         version: 9
 
+  # STEP 2: Install Node.js v20 + cache pnpm's dependency folder
     - name: ⚙️ Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'pnpm'
+        cache: 'pnpm'  # 🚀 SPEED: Reuses downloaded packages next time
 
+  # STEP 3: Install all dependencies (frozen = exact version match with lockfile)
     - name: 📦 Install Dependencies
       shell: bash
       run: pnpm install --frozen-lockfile

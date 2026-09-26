@@ -1,17 +1,26 @@
+# If files changed match "apps/workspace/**" → add label "domain: frontend"
 'domain: frontend':
   - changed-files:
       - any-glob-to-any-file:
           - 'apps/web/**'
           - 'apps/workspace/**'
           - 'libs/**/ui/**'
+          - 'libs/**/feature-*/**'  
+          - 'libs/ui/**'       
 
+# If files match backend paths → add label "domain: backend"
 'domain: backend':
   - changed-files:
       - any-glob-to-any-file:
           - 'apps/*api*/**'
           - 'libs/**/data-access/**'
           - 'libs/**/prisma/**'
+          - 'apps/realtime/**'
+          - 'apps/worker/**'
+          - 'libs/database/**'             
+          - 'libs/cache/**'       
 
+# If files match infrastructure paths → add label "domain: infra"
 'domain: infra':
   - changed-files:
       - any-glob-to-any-file:
@@ -20,3 +29,16 @@
           - 'package.json'
           - 'pnpm-lock.yaml'
           - '.npmrc'
+
+'domain: docs':                             # 👈 NEW LABEL
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '**/*.md'
+
+'domain: dependencies':                     # 👈 NEW LABEL
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'package.json'
+          - 'pnpm-lock.yaml'
+          - '**/package.json'

@@ -1,18 +1,21 @@
 name: 🐛 Bug Report
 description: Report a reproducible problem
-title: '[BUG]: '
-labels: ['bug', 'triage']
+title: '[BUG]: '                          # Auto-fills the issue title
+labels: ['bug', 'triage']                 # Auto-adds these labels
 body:
+  # Field 1: Info banner at the top
   - type: markdown
     attributes:
       value: 'Thanks for reporting. Please fill out the required sections.'
+
+  # Field 2: Text input for which app has the bug
   - type: input
     id: app
     attributes:
       label: Which application / service?
       placeholder: 'e.g. apps/workspace, auth-api'
     validations:
-      required: true
+      required: true                       # ⚠️ Cannot submit without this
   - type: textarea
     id: reproduction
     attributes:
@@ -25,4 +28,4 @@ body:
     attributes:
       label: Error Logs
       description: Paste terminal output or browser console logs here.
-      render: shell
+      render: shell                        # 👈 Formats as code block
