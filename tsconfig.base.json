@@ -19,20 +19,17 @@
     "target": "es2022",
     "customConditions": ["@workspace/source"],
     "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
     "paths": {
       
       "@workspace/database": ["./libs/database/src/index.ts"],
       "@workspace/cache": ["./libs/cache/src/index.ts"],
       "@workspace/ui": ["./libs/ui/src/index.ts"],
-      "@workspace/shared-api-client": ["./libs/shared/api-client/src/index.ts"],
+      "@workspace/shared/api-client": ["./libs/shared/api-client/src/index.ts"],
       "@workspace/shared/types": ["./libs/shared/types/src/index.ts"],
       "@workspace/shared/constants": ["./libs/shared/constants/src/index.ts"],
       "@workspace/ui-primitives": ["./libs/ui/primitives/src/index.ts"],
-      "@workspace/iam-data-access": ["./libs/iam/data-access/src/index.ts"],
-      "@workspace/iam-feature-login": ["./libs/iam/feature-login/src/index.ts"],
+      "@workspace/iam/data-access": ["./libs/iam/data-access/src/index.ts"],
       "@workspace/iam/feature-login": ["./libs/iam/feature-login/src/index.ts"],
-      "@workspace/iam-feature-register": ["./libs/iam/feature-register/src/index.ts"],
       "@workspace/iam/feature-register": ["./libs/iam/feature-register/src/index.ts"],
       "@/*": ["./apps/workspace/src/*"]
     }

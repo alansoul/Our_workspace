@@ -1,0 +1,124 @@
+// ═══════════════════════════════════════════════════════════════
+// IDENTITY & ACCESS MANAGEMENT (IAM)
+// ═══════════════════════════════════════════════════════════════
+
+model User {
+  id             String        @id @default(uuid())
+  email          String        @unique
+  emailVerified  Boolean       @default(false)
+  emailVerifiedAt DateTime?
+  username       String        @unique
+  fullName       String
+  avatarUrl      String?
+  bio            String?
+  
+  // Explicit Account Lifecycle
+  status         AccountStatus @default(ACTIVE)
+
+  // University Multi-Tenancy Link
+  universityId   String
+  university     University    @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  // Academic Details
+  branch         String?     
+  batch          Int?        
+  rollNumber     String?
+
+  // Role-Based Access Control
+  role           Role          @default(STUDENT)
+
+  // Security Relations
+  password       PasswordCredential?
+  sessions       Session[]
+  auditLogs      AuditLog[]
+  resetTokens    PasswordResetToken[]
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([universityId])
+  @@index([email])
+  @@index([role])
+}
+
+enum AccountStatus {
+  INVITED
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  LOCKED
+  DEACTIVATED
+  DELETED
+}
+
+enum Role {
+  STUDENT
+  FACULTY
+  CLUB_HEAD
+  ADMIN
+  SUPER_ADMIN
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECURITY & SESSIONS
+// ═══════════════════════════════════════════════════════════════
+
+model PasswordCredential {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String   @unique
+  passwordHash String   // Argon2id hash
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Session {
+  id                String    @id @default(uuid())
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  
+  // Refresh Token Rotation (Hashed SHA-256)
+  refreshTokenHash  String    @unique
+  familyId          String    @default(uuid()) // Tracks token family to detect reuse
+  
+  deviceInfo        String?   // e.g. "Chrome 128 on macOS"
+  ipAddress         String?   // e.g. "103.21.201.4"
+  
+  isRevoked         Boolean   @default(false)
+  expiresAt         DateTime
+  lastSeenAt        DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id         String    @id @default(uuid())
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId     String?
+  
+  action     String    // e.g. "LOGIN_SUCCESS", "LOGIN_FAILED", "TOKEN_REUSE_DETECTED"
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?     // Stores event context (avoid secrets!)
+  
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}

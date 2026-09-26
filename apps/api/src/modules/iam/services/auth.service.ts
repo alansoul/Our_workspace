@@ -1,7 +1,15 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { AccountStatus, User } from '@workspace/database';
+import { AuthUser } from '@workspace/shared-types';
 import { PrismaService } from '@workspace/database';
+import { PasswordService } from './password.service';
+import { TokenService } from './token.service';
+import { AuditService } from './audit.service';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 
@@ -9,107 +17,186 @@ import { LoginDto } from '../dto/login.dto';
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly passwordService: PasswordService,
+    private readonly tokenService: TokenService,
+    private readonly audit: AuditService,
   ) {}
 
-  async register(dto: RegisterDto) {
-    // 1. Extract email domain (e.g. "student@iiitnr.edu.in" -> "iiitnr.edu.in")
+  // ═══════════════════════════════════════════════════════
+  // REGISTER: User + PasswordCredential + Session + Audit
+  // ═══════════════════════════════════════════════════════
+  async register(dto: RegisterDto, ip?: string, userAgent?: string) {
     const domain = dto.email.split('@')[1]?.toLowerCase();
     if (!domain) {
       throw new BadRequestException('Invalid email format');
     }
 
-    // 2. Validate University Tenant exists for this domain
     const university = await this.prisma.university.findUnique({
       where: { emailDomain: domain },
     });
-
     if (!university) {
       throw new BadRequestException(
-        `Your institution domain (@${domain}) is not registered yet. Contact admin to add your campus.`,
+        `Your institution domain (@${domain}) is not registered. Contact admin.`,
       );
     }
 
-    // 3. Check for duplicate email or username
     const existingUser = await this.prisma.user.findFirst({
       where: {
-        OR: [{ email: dto.email.toLowerCase() }, { username: dto.username.toLowerCase() }],
+        OR: [
+          { email: dto.email.toLowerCase() },
+          { username: dto.username.toLowerCase() },
+        ],
       },
     });
-
     if (existingUser) {
       throw new ConflictException('Email or username is already taken');
     }
 
-    // 4. Hash password with bcrypt
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+    const passwordHash = await this.passwordService.hashPassword(dto.password);
 
-    // 5. Create User linked to the University
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email.toLowerCase(),
-        passwordHash,
-        username: dto.username.toLowerCase(),
-        fullName: dto.fullName,
-        branch: dto.branch,
-        universityId: university.id,
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        fullName: true,
-        role: true,
-        universityId: true,
-      },
+    const user = await this.prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          email: dto.email.toLowerCase(),
+          username: dto.username.toLowerCase(),
+          fullName: dto.fullName,
+          branch: dto.branch,
+          batch: dto.batch,
+          rollNumber: dto.rollNumber,
+          universityId: university.id,
+          status: AccountStatus.ACTIVE,
+        },
+      });
+
+      await tx.passwordCredential.create({
+        data: {
+          userId: createdUser.id,
+          passwordHash,
+        },
+      });
+
+      return createdUser;
     });
 
-    // 6. Sign JWT Access Token
-    const accessToken = await this.generateToken(user.id, user.email, user.role, user.universityId);
+    const tokens = await this.tokenService.createSession(
+      user.id,
+      user.email,
+      user.role,
+      user.universityId,
+      ip,
+      userAgent,
+    );
+
+    await this.audit.log({
+      userId: user.id,
+      action: 'USER_REGISTERED',
+      ipAddress: ip,
+      userAgent,
+    });
 
     return {
       message: 'Registration successful',
-      accessToken,
-      user,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: this.sanitizeUser(user),
     };
   }
 
-  async login(dto: LoginDto) {
+  // ═══════════════════════════════════════════════════════
+  // LOGIN: Credentials + State Check + Session + Audit
+  // ═══════════════════════════════════════════════════════
+  async login(dto: LoginDto, ip?: string, userAgent?: string) {
+    const invalidCredentialsMsg = 'Invalid email or password';
+
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
+      include: { password: true },
     });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
+    if (!user || !user.password) {
+      await this.audit.log({
+        action: 'LOGIN_FAILED_UNKNOWN_USER',
+        ipAddress: ip,
+        userAgent,
+        metadata: { attemptedEmail: dto.email },
+      });
+      throw new UnauthorizedException(invalidCredentialsMsg);
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    if (user.status !== AccountStatus.ACTIVE) {
+      await this.audit.log({
+        userId: user.id,
+        action: 'LOGIN_BLOCKED_INACTIVE_ACCOUNT',
+        ipAddress: ip,
+        userAgent,
+        metadata: { status: user.status },
+      });
+      throw new UnauthorizedException('Account is not active');
+    }
+
+    const isPasswordValid = await this.passwordService.verifyPassword(
+      user.password.passwordHash,
+      dto.password,
+    );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
+      await this.audit.log({
+        userId: user.id,
+        action: 'LOGIN_FAILED_BAD_PASSWORD',
+        ipAddress: ip,
+        userAgent,
+      });
+      throw new UnauthorizedException(invalidCredentialsMsg);
     }
 
-    const accessToken = await this.generateToken(user.id, user.email, user.role, user.universityId);
+    const tokens = await this.tokenService.createSession(
+      user.id,
+      user.email,
+      user.role,
+      user.universityId,
+      ip,
+      userAgent,
+    );
+
+    await this.audit.log({
+      userId: user.id,
+      action: 'LOGIN_SUCCESS',
+      ipAddress: ip,
+      userAgent,
+    });
 
     return {
-      accessToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        fullName: user.fullName,
-        role: user.role,
-        universityId: user.universityId,
-      },
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: this.sanitizeUser(user),
     };
   }
 
-  private async generateToken(userId: string, email: string, role: string, universityId: string) {
-    return this.jwtService.signAsync({
-      sub: userId,
-      email,
-      role,
-      universityId,
-    });
+  // ═══════════════════════════════════════════════════════
+  // REFRESH & LOGOUT
+  // ═══════════════════════════════════════════════════════
+  async refreshSession(refreshToken: string, ip?: string, userAgent?: string) {
+    const result = await this.tokenService.rotateSession(refreshToken, ip, userAgent);
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      user: this.sanitizeUser(result.user),
+    };
+  }
+
+  async logout(refreshToken: string) {
+    await this.tokenService.revokeSession(refreshToken);
+  }
+
+  private sanitizeUser(user: User): AuthUser {
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      fullName: user.fullName,
+      role: user.role,
+      status: user.status,
+      universityId: user.universityId,
+      emailVerified: user.emailVerified,
+    };
   }
 }

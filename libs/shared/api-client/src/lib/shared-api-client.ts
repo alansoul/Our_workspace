@@ -9,19 +9,29 @@ export interface ApiOptions extends RequestInit {
 export async function apiFetch<T = unknown>(path: string, options: ApiOptions = {}): Promise<T> {
   const token = Cookies.get('token');
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
+
   const res = await fetch(`${API_URL}${path}`, {
+    // 👈 REQUIRED: Tells the browser to send & receive HttpOnly cookies across origins
+    credentials: 'include',
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
+    headers,
   });
 
   const data: Record<string, unknown> = (await res.json().catch(() => ({}))) as Record<string, unknown>;
 
   if (!res.ok) {
-    const message = typeof data['message'] === 'string' ? data['message'] : `API Error: ${res.status}`;
+    // Handles NestJS ValidationPipe errors (which return an array of strings) as well as single string errors
+    const message = Array.isArray(data['message'])
+      ? data['message'].join(', ')
+      : typeof data['message'] === 'string'
+      ? data['message']
+      : `API Error: ${res.status}`;
+
     throw new Error(message);
   }
 

@@ -1,0 +1,21 @@
+// ═══════════════════════════════════════════════════════════════
+// MULTI-TENANCY & CORE DOMAIN
+// ═══════════════════════════════════════════════════════════════
+
+model University {
+  id           String   @id @default(uuid())
+  name         String   // "Dr. Shyama Prasad Mukherjee IIIT Naya Raipur"
+  shortCode    String   @unique // "IIITNR"
+  emailDomain  String   @unique // "iiitnr.edu.in"
+  logoUrl      String?
+  isActive     Boolean  @default(true)
+
+  // Relations mapping back to User in iam.prisma
+  users        User[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([shortCode])
+  @@index([emailDomain])
+}

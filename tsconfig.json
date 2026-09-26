@@ -50,6 +50,7 @@
     },
     {
       "path": "./libs/iam/feature-register"
-    }
+    },
+    { "path": "./libs/shared/types" }
   ]
 }

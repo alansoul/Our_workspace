@@ -1,7 +1,7 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class RegisterDto {
-  @IsEmail({}, { message: 'Must be a valid email address' })
+  @IsEmail()
   @IsNotEmpty()
   email!: string;
 
@@ -19,5 +19,13 @@ export class RegisterDto {
 
   @IsString()
   @IsOptional()
-  branch?: string; // e.g. "CSE", "DSAI"
+  branch?: string;
+
+  @IsInt()
+  @IsOptional()
+  batch?: number;
+
+  @IsString()
+  @IsOptional()
+  rollNumber?: string;
 }

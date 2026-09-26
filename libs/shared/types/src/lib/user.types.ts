@@ -1,10 +1,4 @@
-export enum Role {
-  STUDENT = 'STUDENT',
-  FACULTY = 'FACULTY',
-  CLUB_HEAD = 'CLUB_HEAD',
-  ADMIN = 'ADMIN',
-  SUPER_ADMIN = 'SUPER_ADMIN',
-}
+import { Role } from '@prisma/client';
 
 export interface UserProfile {
   id: string;
@@ -19,7 +13,5 @@ export interface UserProfile {
   role: Role;
 }
 
-export interface AuthResponse {
-  accessToken: string;
-  user: UserProfile;
-}
+// Re-export Prisma enums for frontend use
+export { Role };
