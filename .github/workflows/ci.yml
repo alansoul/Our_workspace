@@ -31,7 +31,7 @@ jobs:
 
       # STEP 3: Figure out which commits to compare against
       - name: 🔍 Derive SHAs for nx affected
-        uses: nrwl/nx-set-shas@v4
+        uses: nrwl/nx-set-shas@v5
 
       # STEP 4: 🧹 Lint only the projects that were affected by the changes
       - name: 🧹 Lint Affected
