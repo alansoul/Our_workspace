@@ -21,7 +21,7 @@ jobs:
     steps:
       # STEP 1: Download your code onto the GitHub VM
       - name: 🛒 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0                     # Get FULL git history (needed for "affected")
 
