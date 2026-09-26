@@ -10,6 +10,6 @@ jobs:
       contents: read                           # Read the files changed
       pull-requests: write                     # Add labels to the PR
     steps:
-      - uses: actions/labeler@v5               # Official GitHub labeler
+      - uses: actions/labeler@v7               # Official GitHub labeler
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'          # Auto-generated GitHub token
